@@ -1,0 +1,21 @@
+@import '../../colors/colors.less';
+
+.row {
+  background-color: @dawn-pink;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  position: fixed;
+  z-index: 1;
+
+  button {
+    margin-left: 15px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .row {
+    span:nth-of-type(2) {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+@import '../../../colors/colors.less';
+
+header {
+  background-color: @white;
+  font-size: 25px;
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+  
+  .name {
+    font-size: 45px;
+    padding: 10px;
+    text-transform: capitalize;
+  }
+
+  @media screen and (max-width: 768px) {
+    .name {
+      font-size: 30px;
+      padding: 5px;
+    }
+  }
+}

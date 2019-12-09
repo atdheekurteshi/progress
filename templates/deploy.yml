@@ -1,0 +1,42 @@
+parameters:
+  deployment: ''
+  displayName: ''
+  environment: ''
+  stageName: ''
+  webAppName: ''
+
+stages:
+- stage: ${{ parameters.stageName }}
+  displayName: ${{ parameters.displayName }}
+  # Declare that stage depends on Build stage been executed successfully.
+  dependsOn: Build
+  jobs:
+  - deployment: ${{ parameters.deployment }}
+    pool:
+      # Virtual machine image that will be used in order to create required machine.
+      vmImage: 'ubuntu-latest'
+    # Environemnt to which deployment should be performed.
+    environment: ${{ parameters.environment }}
+    variables:
+      # Use variables that can be found within Secrets and Release variables group.
+    # Issue with the authorization.
+    # The required ConnectedServiceName variable value will be provided as a Pipeline variable.
+    #- group: Secrets
+    - group: Release
+    strategy:
+      # Run the deployment once only.
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureRmWebAppDeployment@4
+            # Deploy application to chosen environment.
+            displayName: ${{ parameters.displayName }}
+            inputs:
+              azureSubscription: '$(ConnectedServiceName)'
+              appType: 'webAppLinux'
+              WebAppName: ${{ parameters.webAppName }}
+              packageForLinux: '$(Pipeline.Workspace)/app/s'
+              RuntimeStack: 'NODE|10-lts'
+              StartupCommand: '$(StartupCommand)'
+              WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
+              AppSettings: '-WEBSITE_NODE_DEFAULT_VERSION 10.12.0'

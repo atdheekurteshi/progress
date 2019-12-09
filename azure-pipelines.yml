@@ -1,0 +1,73 @@
+# Trigger pipeline each time master branch is updated.
+trigger:
+- master
+stages:
+- stage: 'Build'
+  displayName: 'Build Angular application'
+  jobs: 
+  - job: 'Build'
+    displayName: 'Build application'
+    pool:
+      # Virtual machine image that will be used in order to create required machine.
+      vmImage: 'ubuntu-latest'
+    variables:
+      # Use variables that can be found within Build variable group.
+    - group: Build
+    steps:
+    - task: NodeTool@0
+      # Install required Node.js version on which the application will run.
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+    - task: Npm@1
+      # Install Angular Command Line Interface.
+      inputs:
+        command: 'custom'
+        customCommand: 'install -g @angular/cli'
+      displayName: 'Install Angular CLI'
+    - task: Npm@1
+      # Install required NPM packages.
+      inputs:
+        command: 'install'
+      displayName: 'Install npm packages'
+    - task: FileTransform@1
+      # Change configuration value.
+      inputs:
+        folderPath: '$(System.DefaultWorkingDirectory)/src/app/configuration/'
+        fileType: json
+        targetFiles: configuration.json
+      displayName: 'Change configuration value'
+    - task: Npm@1
+      # Build application.
+      inputs:
+        command: 'custom'
+        customCommand: 'run build'
+      displayName: 'Build app'
+    - task: PublishPipelineArtifact@1
+      # Publish application artifact.
+      inputs:
+        targetPath: '$(Pipeline.Workspace)'
+        artifact: 'app'
+        publishLocation: 'pipeline'
+      displayName: 'Publish artifact'
+- template: templates/deploy.yml
+  parameters:
+    deployment: 'DeployDevelopment'
+    displayName: 'Deploy Angular application to development environment'
+    environment: 'Development'
+    stageName: 'DeployDevelopment'
+    webAppName: '$(DevEnvironemntWebAppName)'
+- template: templates/deploy.yml
+  parameters:
+    deployment: 'DeployTest'
+    displayName: 'Deploy Angular application to test environment'
+    environment: 'Test'
+    stageName: 'DeployTest'
+    webAppName: '$(TestEnvironemntWebAppName)'
+- template: templates/deploy.yml
+  parameters:
+    deployment: 'DeployProduction'
+    displayName: 'Deploy Angular application to production environment'
+    environment: 'Production'
+    stageName: 'DeployProduction'
+    webAppName: '$(WebAppName)'

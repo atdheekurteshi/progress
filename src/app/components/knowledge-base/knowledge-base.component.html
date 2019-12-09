@@ -1,0 +1,36 @@
+<div class='row'>
+  <div class='row'>
+    <div class='github-navigation'>
+      <div class="btn-group">
+        <button
+          class='btn'
+          type='button'
+          [ngClass]="{'btn-secondary': shouldGistsBeShown, 'btn-dark': shouldRepositoriesBeShown}"
+          (click)='showRepositories()'>
+          <span>
+          {{ repositories }}
+          </span>
+        </button>
+        <button
+          class='btn'
+          type='button'
+          [ngClass]="{'btn-secondary': shouldRepositoriesBeShown, 'btn-dark': shouldGistsBeShown}"
+          (click)='showGists()'>
+          <span>
+            {{ gists }}
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class='col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+      *ngIf='shouldRepositoriesBeShown'>
+      <training-knowledge-base-github-repository></training-knowledge-base-github-repository>
+    </div>
+    <div
+      class='col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12'
+      *ngIf='shouldGistsBeShown' >
+      <training-knowledge-base-github-gist></training-knowledge-base-github-gist>
+    </div>
+  </div>
+</div>
